@@ -107,47 +107,46 @@ Make the milestone titles extremely micro-focused, clear, and actionable. Add pu
       return res.json({ milestones: structuredMilestones });
 
     } catch (err: any) {
-      console.error("Gemini demolish error:", err);
-      return res.status(500).json({ error: "Failed to generate milestones via AI: " + err.message });
+      console.error("Gemini demolish error, falling back to mock generator:", err);
     }
-  } else {
-    // High-quality mock fallback if no API Key provided
-    console.log("Using high-quality fallback for task breakdown");
-    const numMilestones = 4;
-    const mockTitles = [
-      `Initiate Demolition: Outline "${title}"`,
-      `Core Construction: Draft first half`,
-      `The Heavy Lifting: Refine draft and fix errors`,
-      `Final Polish & Polish: Complete submission checklist`
-    ];
-    const mockDescriptions = [
-      "No more thinking, just write down the skeleton. 15 minutes. Go!",
-      "Turn off your phone. Block your ex. Write the meat of it right now.",
-      "You're in the deep end. Fight the urge to look at cat memes.",
-      "The deadline is breathing on your neck. Run a quick check and ship it!"
-    ];
-
-    let currentOffsetMinutes = 0;
-    const stepInterval = totalRemainingMinutes < (numMilestones * 15)
-      ? Math.max(5, Math.floor(totalRemainingMinutes / numMilestones))
-      : 15;
-
-    const milestones = Array.from({ length: numMilestones }).map((_, idx) => {
-      const milestoneTime = new Date(parsedCurrent.getTime() + currentOffsetMinutes * 60000);
-      currentOffsetMinutes += stepInterval;
-      return {
-        id: `milestone-mock-${Date.now()}-${idx}`,
-        title: mockTitles[idx] || "Focused micro-sprint",
-        description: mockDescriptions[idx] || "Focus 100% for 15 minutes.",
-        durationMinutes: 15,
-        isCompleted: false,
-        order: idx + 1,
-        scheduledTime: milestoneTime.toISOString()
-      };
-    });
-
-    return res.json({ milestones });
   }
+
+  // High-quality mock fallback if no API Key provided or if API call fails
+  console.log("Using high-quality fallback for task breakdown");
+  const numMilestones = 4;
+  const mockTitles = [
+    `Initiate Demolition: Outline "${title}"`,
+    `Core Construction: Draft first half`,
+    `The Heavy Lifting: Refine draft and fix errors`,
+    `Final Polish & Polish: Complete submission checklist`
+  ];
+  const mockDescriptions = [
+    "No more thinking, just write down the skeleton. 15 minutes. Go!",
+    "Turn off your phone. Block your ex. Write the meat of it right now.",
+    "You're in the deep end. Fight the urge to look at cat memes.",
+    "The deadline is breathing on your neck. Run a quick check and ship it!"
+  ];
+
+  let currentOffsetMinutes = 0;
+  const stepInterval = totalRemainingMinutes < (numMilestones * 15)
+    ? Math.max(5, Math.floor(totalRemainingMinutes / numMilestones))
+    : 15;
+
+  const milestones = Array.from({ length: numMilestones }).map((_, idx) => {
+    const milestoneTime = new Date(parsedCurrent.getTime() + currentOffsetMinutes * 60000);
+    currentOffsetMinutes += stepInterval;
+    return {
+      id: `milestone-mock-${Date.now()}-${idx}`,
+      title: mockTitles[idx] || "Focused micro-sprint",
+      description: mockDescriptions[idx] || "Focus 100% for 15 minutes.",
+      durationMinutes: 15,
+      isCompleted: false,
+      order: idx + 1,
+      scheduledTime: milestoneTime.toISOString()
+    };
+  });
+
+  return res.json({ milestones });
 });
 
 
@@ -206,33 +205,32 @@ Generate a JSON object matching the schema. The reminder text must be short, pun
       });
 
     } catch (err: any) {
-      console.error("Gemini nudge error:", err);
-      return res.status(500).json({ error: "Failed to generate AI nudge: " + err.message });
+      console.error("Gemini nudge error, falling back to mock coach:", err);
     }
-  } else {
-    // Funny mock replies based on mood and anger level
-    let responseText = "";
-    let nextAnger = Math.min(10, currentAnger + 1);
-
-    if (userMood === 'Distracted') {
-      responseText = `I saw you look at that other tab, don't lie to me. "${title}" won't code itself while you study the lore of 2000s cartoon network shows. Close it or I will double my nagging!`;
-    } else if (userMood === 'Tired') {
-      responseText = `Tired? Slap some cold water on your face, play some high-tempo synthwave, and smash this milestone. We have exactly ${uncompletedMilestonesCount} blocks left before doom!`;
-    } else if (userMood === 'Panicked') {
-      responseText = `Aaaah! Why are we screaming?! Don't panic, just do the milestone. If you spend 10 minutes panicking, that is 66% of a milestone wasted! Deep breath, let's crush it.`;
-    } else {
-      responseText = `You're feeling Focused? Excellent. Harness that beautiful, rare cosmic energy before a shiny object completely derails us from "${title}". Lock in!`;
-    }
-
-    if (currentAnger >= 8) {
-      responseText = `🚨 WAKE UP! DEADLINE ALERT! "${title.toUpperCase()}" IS DUE SOON AND YOU HAVE ${uncompletedMilestonesCount} MILESTONES WAITING! MOVE, MOVE, MOVE!`;
-    }
-
-    return res.json({
-      reminderText: responseText,
-      angerLevel: nextAnger
-    });
   }
+
+  // Funny mock replies based on mood and anger level
+  let responseText = "";
+  let nextAnger = Math.min(10, currentAnger + 1);
+
+  if (userMood === 'Distracted') {
+    responseText = `I saw you look at that other tab, don't lie to me. "${title}" won't code itself while you study the lore of 2000s cartoon network shows. Close it or I will double my nagging!`;
+  } else if (userMood === 'Tired') {
+    responseText = `Tired? Slap some cold water on your face, play some high-tempo synthwave, and smash this milestone. We have exactly ${uncompletedMilestonesCount} blocks left before doom!`;
+  } else if (userMood === 'Panicked') {
+    responseText = `Aaaah! Why are we screaming?! Don't panic, just do the milestone. If you spend 10 minutes panicking, that is 66% of a milestone wasted! Deep breath, let's crush it.`;
+  } else {
+    responseText = `You're feeling Focused? Excellent. Harness that beautiful, rare cosmic energy before a shiny object completely derails us from "${title}". Lock in!`;
+  }
+
+  if (currentAnger >= 8) {
+    responseText = `🚨 WAKE UP! DEADLINE ALERT! "${title.toUpperCase()}" IS DUE SOON AND YOU HAVE ${uncompletedMilestonesCount} MILESTONES WAITING! MOVE, MOVE, MOVE!`;
+  }
+
+  return res.json({
+    reminderText: responseText,
+    angerLevel: nextAnger
+  });
 });
 
 
