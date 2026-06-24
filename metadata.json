@@ -1,0 +1,6 @@
+{
+  "name": "NudgeMind",
+  "description": "An AI-powered proactive productivity companion designed to stop students and professionals from missing deadlines using visual timelines, adaptive auto-pilot rescheduling, and funny, increasingly aggressive reminders from an AI coach.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
